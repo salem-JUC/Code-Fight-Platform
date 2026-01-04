@@ -15,7 +15,7 @@ public class TestCaseRepo {
 
     // Save a new test case
     public void save(TestCase testCase) {
-        String sql = "INSERT INTO TestCase (testCaseID, ChallengeID, input, ExpectedOutput) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO TestCase (testCaseID, ChallengeID, `input`, ExpectedOutput) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, testCase.getTestCaseID(), testCase.getChallengeID(), testCase.getInput(), testCase.getExpectedOutput());
     }
 
@@ -45,7 +45,7 @@ public class TestCaseRepo {
 
     // Update a test case
     public void update(TestCase testCase) {
-        String sql = "UPDATE TestCase SET ChallengeID = ?, input = ?, ExpectedOutput = ? WHERE testCaseID = ?";
+        String sql = "UPDATE TestCase SET ChallengeID = ?, `input` = ?, ExpectedOutput = ? WHERE testCaseID = ?";
         jdbcTemplate.update(sql, testCase.getChallengeID(), testCase.getInput(), testCase.getExpectedOutput(), testCase.getTestCaseID());
     }
 

@@ -101,7 +101,7 @@ public class SubmissionRepo {
         String sql = """
                 select u.USERNAME , s.CODE , s.RESULT , s.PROGRAMMINGLANGUAGE , c.TITLE , c.DESCRIPTION , c.DIFFICULTY , c.ChallengeID
                 from SUBMISSION s
-                inner join "user" u on s.SUBMITTERID = u.USERID
+                inner join `user` u on s.SUBMITTERID = u.USERID
                 inner join CHALLENGE c on s.CHALLENGEID = c.CHALLENGEID
                 where s.SUBMISSIONID = ? ;
                 """;
@@ -128,7 +128,7 @@ public class SubmissionRepo {
         String sql = """
                 select u.USERNAME , s.SUBMISSIONID , c.TITLE , c.DIFFICULTY , s.PROGRAMMINGLANGUAGE , s.RESULT\s
                 from SUBMISSION s
-                join "user" u on u.USERID = s.SUBMITTERID\s
+                join `user` u on u.USERID = s.SUBMITTERID\s
                 join CHALLENGE c on c.CHALLENGEID = s.CHALLENGEID\s
                 where c.CHALLENGEID = ? ;
                 """;

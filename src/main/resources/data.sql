@@ -1,9 +1,9 @@
-INSERT INTO "user" (userID, Username, Email, Password, Role, Score)
+INSERT IGNORE INTO `user` (userID, Username, Email, Password, Role, Score)
 VALUES
 (3, 'SalemX', 'salem@example.com', '{noop}123456', 'PLAYER', 0),
 (4, 'SalehX', 'saleh@example.com', '{noop}123456', 'PLAYER', 0);
 
-INSERT INTO Challenge (ChallengeID, Title, Description, Difficulty, Sample)
+INSERT IGNORE INTO Challenge (ChallengeID, Title, Description, Difficulty, Sample)
 VALUES
 (1, 'Sum of Two Numbers', 'Read two integers and print their sum.', 'Easy', 'Input: 3 5 Output: 8'),
 (2, 'Even or Odd', 'Reada number then print if an integer is even or odd.', 'Easy', 'Input: 4 Output: Even'),
@@ -21,24 +21,7 @@ VALUES
 (14, 'Count Letters in a String', 'Count the number of letters in a string (excluding spaces).', 'Hard', 'Input: hello world Output: 10'),
 (15, 'Capitalize First Letter', 'Convert the first character of a word to uppercase.', 'Hard', 'Input: hello Output: Hello');
 
---INSERT INTO SUBMISSION
---(SUBMISSIONID, CHALLENGEID, SUBMITTERID, RESULT, CODE, PROGRAMMINGLANGUAGE)
---VALUES
---(1, 1, 1, 'SUCCESS', 'public class Hello { public static void main(String[] args){ System.out.println("Hello World"); } }', 'Java'),
---
---(2, 2, 2, 'FAILURE', 'print("Hello World")', 'Python'),
---
---(3, 2, 4, 'SUCCESS', '#include <iostream>\nusing namespace std;\nint main(){ cout << "Hello C++"; return 0; }', 'C++'),
---
---(4, 3, 5, 'SUCCESS', 'console.log("Hello JavaScript");', 'JavaScript'),
---
---(5, 4, 4, 'FAILURE', 'SELECT * FROM users;', 'SQL');
-
-
-
-
-
-INSERT INTO TestCase (testCaseID, ChallengeID, "input", ExpectedOutput)
+INSERT IGNORE INTO TestCase (testCaseID, ChallengeID, `input`, ExpectedOutput)
 VALUES
 (1, 1, '3 5', '8'),
 (2, 1, '5 5', '10'),
@@ -70,6 +53,3 @@ VALUES
 (28, 14, 'code duel platform', '16'),
 (29, 15, 'hello', 'Hello'),
 (30, 15, 'code', 'Code');
-
-
-

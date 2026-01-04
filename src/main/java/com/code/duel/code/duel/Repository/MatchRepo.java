@@ -25,7 +25,7 @@ public class MatchRepo {
 
     // Save a new match
     public void save(Match match) {
-        String sql = "INSERT INTO \"match\" (matchID, current_challenge_id, difficulty, programmingLanguage,status, winnerId) VALUES (?,?,? ,?, ? ,?)";
+        String sql = "INSERT INTO `match` (matchID, current_challenge_id, difficulty, programmingLanguage,status, winnerId) VALUES (?,?,? ,?, ? ,?)";
 
         jdbcTemplate.update(sql,
                 match.getMatchID(),
@@ -38,7 +38,7 @@ public class MatchRepo {
 
     // Find a match by ID
     public Match findById(Long matchID) {
-        String sql = "SELECT * FROM \"match\" WHERE matchID = ?";
+        String sql = "SELECT * FROM `match` WHERE matchID = ?";
 
         return jdbcTemplate.queryForObject(sql, new Object[]{matchID}, (rs, rowNum) ->
                 new Match(
@@ -54,7 +54,7 @@ public class MatchRepo {
 
     // Find all matches
     public List<Match> findAll() {
-        String sql = "SELECT * FROM \"match\"";
+        String sql = "SELECT * FROM `match`";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
                         rs.getLong("matchID"),
@@ -68,7 +68,7 @@ public class MatchRepo {
 
     // Update a match (including challenge ID)
     public void update(Match match) {
-        String sql = "UPDATE \"match\" SET status = ?, current_challenge_id = ?, winnerId = ? WHERE matchID = ?";
+        String sql = "UPDATE `match` SET status = ?, current_challenge_id = ?, winnerId = ? WHERE matchID = ?";
         jdbcTemplate.update(sql,
                 match.getStatus(),
                 match.getCurrentChallengeId(),
@@ -79,19 +79,19 @@ public class MatchRepo {
 
     // Update only the current challenge ID
     public void updateChallenge(Long matchId, Long challengeId) {
-        String sql = "UPDATE \"match\" SET current_challenge_id = ? WHERE matchID = ?";
+        String sql = "UPDATE `match` SET current_challenge_id = ? WHERE matchID = ?";
         jdbcTemplate.update(sql, challengeId, matchId);
     }
 
     // Delete a match by ID
     public void deleteById(Long matchID) {
-        String sql = "DELETE FROM \"match\" WHERE matchID = ?";
+        String sql = "DELETE FROM `match` WHERE matchID = ?";
         jdbcTemplate.update(sql, matchID);
     }
 
     // Find matches by status
     public List<Match> findByStatus(String status) {
-        String sql = "SELECT * FROM \"match\" WHERE status = ?";
+        String sql = "SELECT * FROM `match` WHERE status = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
                         rs.getLong("matchID"),
@@ -105,7 +105,7 @@ public class MatchRepo {
 
     // Find first pending match
     public Optional<Match> findFirstPending() {
-        String sql = "SELECT * FROM \"match\" WHERE status = 'PENDING' ORDER BY matchID ASC LIMIT 1";
+        String sql = "SELECT * FROM `match` WHERE status = 'PENDING' ORDER BY matchID ASC LIMIT 1";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
                         rs.getLong("matchID"),
@@ -121,7 +121,7 @@ public class MatchRepo {
         String sql = """
             SELECT m.matchID, m.current_challenge_id, m.difficulty, 
                    m.programmingLanguage, m.status, m.winnerId
-            FROM "match" m
+            FROM `match` m
             JOIN user_play_match upm ON m.matchID = upm.matchID
             WHERE upm.userID = ?
             ORDER BY m.matchID DESC
@@ -143,7 +143,7 @@ public class MatchRepo {
         String sql = """
             SELECT m.matchID, m.current_challenge_id, m.difficulty, 
                    m.programmingLanguage, m.status, m.winnerId
-            FROM "match" m
+            FROM `match` m
             WHERE m.winnerId = ?
             ORDER BY m.matchID DESC
             """;
@@ -174,7 +174,7 @@ public class MatchRepo {
                 supm.USERNAME as SecondName ,
                 supm.USERSCORE  as SecondScore ,
                 supm.USERID as SecondId
-                from "match" as m
+                from `match` as m
                 join CHALLENGE as c ON c.CHALLENGEID = m.CURRENT_CHALLENGE_ID
                 join USER_PLAY_MATCH  as fupm ON fupm.MATCHID = m.MATCHID AND fupm.USERID = ?
                 join USER_PLAY_MATCH  as supm ON supm.MATCHID = m.MATCHID AND supm.USERID != ?
@@ -204,7 +204,7 @@ public class MatchRepo {
     }
 
     public Long findRunningMatchOfUser(Long userId){
-        String sql = "select m.MATCHID from \"match\" as m\n" +
+        String sql = "select m.MATCHID from `match` as m\n" +
                 "join USER_PLAY_MATCH as upm ON upm.MATCHID = m.MATCHID AND upm.USERID = ? AND m.STATUS = 'RUNNING';";
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sql , userId);
         if (rs.next()){
