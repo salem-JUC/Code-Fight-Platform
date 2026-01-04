@@ -274,8 +274,16 @@
                         wrapper.classList.add('active');
                     }
                 } else {
-                    const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                    showGameError(errorData.message || 'Registration failed. Please try again.');
+                    let errorMessage = 'Registration failed. Please try again.';
+                    if (response.status === 409) {
+                        errorMessage = await response.text().catch(() => errorMessage);
+                    } else {
+                        const errorData = await response.json().catch(() => null);
+                        if (errorData && typeof errorData.message === 'string') {
+                            errorMessage = errorData.message;
+                        }
+                    }
+                    showGameError(errorMessage || 'Registration failed. Please try again.');
                 }
             } catch (error) {
                 showGameError('Connection error: ' + error.message);

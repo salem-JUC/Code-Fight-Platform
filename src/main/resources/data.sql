@@ -1,8 +1,3 @@
-INSERT IGNORE INTO `user` (userID, Username, Email, Password, Role, Score)
-VALUES
-(3, 'SalemX', 'salem@example.com', '{noop}123456', 'PLAYER', 0),
-(4, 'SalehX', 'saleh@example.com', '{noop}123456', 'PLAYER', 0);
-
 INSERT IGNORE INTO Challenge (ChallengeID, Title, Description, Difficulty, Sample)
 VALUES
 (1, 'Sum of Two Numbers', 'Read two integers and print their sum.', 'Easy', 'Input: 3 5 Output: 8'),

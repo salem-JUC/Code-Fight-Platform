@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -81,8 +83,11 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
+
         authenticationManagerBuilder
-                .userDetailsService(userDetailsService());
+                .userDetailsService(userDetailsService())
+                .passwordEncoder(passwordEncoder());
+                
         return authenticationManagerBuilder.build();
     }
 
@@ -91,4 +96,11 @@ public class SecurityConfiguration {
         return (web) -> web.ignoring()
                 .requestMatchers("/Style/**", "/Script/**", "/Asset/**", "/favicon.ico" , "/error/**");
     }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 }

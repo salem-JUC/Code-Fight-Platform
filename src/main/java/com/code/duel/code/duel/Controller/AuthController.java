@@ -2,8 +2,8 @@ package com.code.duel.code.duel.Controller;
 
 import com.code.duel.code.duel.Mappers.RequestMapper.UserRegisterRequest;
 import com.code.duel.code.duel.Model.User;
-import com.code.duel.code.duel.Repository.UserRepo;
-import com.code.duel.code.duel.Service.MatchService;
+import com.code.duel.code.duel.Service.AuthService;
+import com.code.duel.code.duel.Exception.UsernameAlreadyTakenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final AuthService authService;
+
     @Autowired
-    UserRepo userRepo;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -34,29 +38,18 @@ public class AuthController {
 
         return ResponseEntity.ok(user);
     }
-    Long idIncrement = 1000L;
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody UserRegisterRequest request) {
-        logger.info("Registering attempt new user with username: {}", request.getUsername());
-        User newUser = new User();
-        newUser.setUsername(request.getUsername());
-        newUser.setEmail(request.getEmail());
-        newUser.setPassword("{noop}"+request.getPassword());
-        newUser.setRole("PLAYER");
-        newUser.setUserID(idIncrement);
-        newUser.setScore(0);
-        idIncrement++;
+    public ResponseEntity<Object> registerUser(@RequestBody UserRegisterRequest request) {
         try {
-            userRepo.save(newUser);
-        }catch (DataAccessException e){
-            idIncrement--;
+            User newUser = authService.registerUser(request);
+            return ResponseEntity.created(null).body(newUser);
+        } catch (UsernameAlreadyTakenException e) {
+            logger.info("Username already taken: {}", request.getUsername());
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (DataAccessException e) {
             logger.info("User registration failed with username: {}", request.getUsername());
-            System.out.println(e.getMessage());
             return ResponseEntity.status(409).build();
         }
-
-        logger.info("User registered successfully with username: {}", request.getUsername());
-        return ResponseEntity.created(null).body(newUser);
     }
 
 
