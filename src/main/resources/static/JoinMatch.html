@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="./Style/styleMMK.css" />
   <link rel="stylesheet" href="./Style/styleSetting.css">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <script src="./Script/auth-guard.js" defer></script>
   <title>Code Fight</title>
 </head>
 <body>
@@ -108,29 +109,16 @@
   </section>
 
   <script>
-  
-    async function getUser() {
-      try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include' // Include cookies for authentication
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        
-        const user = await response.json();
-        document.getElementById("userNameSpan").innerText = user.username;
-        return user;
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        // Redirect to login if not authenticated
-        window.location.href = 'Homepage.html';
-        return null;
+    function hydrateUserFromSession() {
+      const user = window.getCachedUser?.();
+      if (!user) {
+        return;
       }
+      document.getElementById("userNameSpan").innerText = user.username;
+      return user;
     }
-    getUser()
-   
+
+    document.addEventListener('DOMContentLoaded', hydrateUserFromSession);
   </script>
 </body>
 <script src="./Script/LogReg.js"></script>

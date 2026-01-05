@@ -1,26 +1,14 @@
-async function fetchCurrentUser() {
-    try {
-      const response = await fetch('/api/auth/me', {
-        credentials: 'include' // Important for sending cookies
-      });
-      
-      if (!response.ok) {
-        if (response.status === 401) {
-          window.location.href = '/login'; // Redirect if unauthorized
-          return;
-        }
-        throw new Error('Failed to fetch user data');
-      }
-      
-      const user = await response.json();
-      console.log(user)
-      return user
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      return null;
+async function getGuardedUser() {
+    const cached = window.getCachedUser?.();
+    if (cached) {
+        return cached;
     }
+    if (window.ensureAuthenticatedUser) {
+        return await window.ensureAuthenticatedUser();
+    }
+    return null;
 }
-
+ 
 async function getUserStatistics() {
     try {
         const response = await fetch('/api/user/statics', {
@@ -64,7 +52,11 @@ async function getUserMatches() {
 }
 
 async function displayRecentMatches() {
-    const user = await fetchCurrentUser()
+    const user = await getGuardedUser()
+    if (!user) {
+        console.warn('No authenticated user to evaluate match history.');
+        return;
+    }
     console.log("user from display function" , user)
     try {
         const response = await fetch("/api/match/matchesByUser", {
@@ -120,7 +112,11 @@ async function displayRecentMatches() {
 async function displayDetails() {
     const statics = await getUserStatistics();
     const matches = await getUserMatches();
-    const user = await fetchCurrentUser()
+    const user = await getGuardedUser()
+    if (!user) {
+        console.warn('No authenticated user for profile display.');
+        return;
+    }
 
     document.getElementById("winLoseRatio").innerHTML = statics.winLoseRatio
     document.getElementById("totalMatches").innerHTML = statics.totalMatches

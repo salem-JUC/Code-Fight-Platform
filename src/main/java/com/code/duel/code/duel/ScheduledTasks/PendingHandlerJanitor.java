@@ -47,7 +47,7 @@ public class PendingHandlerJanitor {
     private void performQuitLogic(Long userId) {
         Long matchId = matchService.getOnlyRunningMatchIdOfUser(userId);
         UserPlayMatch winner = matchService.getTheOpponent(matchId , userId);
-        matchService.endMatch(matchId , userId);
+        matchService.endMatch(matchId , winner.getUserID());
         messagingTemplate.convertAndSend(
                 "/topic/match/" + matchId + "/ended",
                 new MatchResult(winner.getUserID(), winner.getUsername())

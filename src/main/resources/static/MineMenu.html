@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="./Style/styleMM.css" />
   <link rel="stylesheet" href="./Style/styleSetting.css">
- <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <script src="./Script/auth-guard.js" defer></script>
   <title>Code Fight</title>
 </head>
 <body>
@@ -115,49 +116,32 @@
   </section>
 
   <script>
-    async function getUser() {
-      try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include' // Include cookies for authentication
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-        
-        const user = await response.json();
-        document.getElementById("userNameSpan").innerText = user.username;
-        return user;
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        // Redirect to login if not authenticated
-        window.location.href = 'Login.html';
+    function hydrateUserFromSession() {
+      const user = window.getCachedUser?.();
+      if (!user) {
         return null;
       }
+      document.getElementById("userNameSpan").innerText = user.username;
+      return user;
     }
 
-    // Logout function
     async function logout() {
       try {
         const response = await fetch('/api/auth/logout', {
           method: 'POST',
           credentials: 'include'
         });
-        
+        window.authGuard?.clearCachedUser?.();
         if (response.ok) {
           window.location.href = 'Login.html';
         }
       } catch (error) {
         console.error('Logout failed:', error);
+        window.authGuard?.clearCachedUser?.();
       }
     }
 
-    // Load user when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      getUser();
-    });
-
-   
+    document.addEventListener('DOMContentLoaded', hydrateUserFromSession);
   </script>
   <script>
 document.querySelector('your-element').addEventListener('click', () => {

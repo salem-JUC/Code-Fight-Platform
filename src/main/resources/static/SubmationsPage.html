@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="./Style/styleSP.css">
     <link rel="stylesheet" href="./Style/stylepp.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./Script/auth-guard.js" defer></script>
     <title>Submissions Table</title>
 </head>
 <body>
@@ -30,26 +31,14 @@
 </body>
 <script>
     async function fetchCurrentUser() {
-        try {
-        const response = await fetch('/api/auth/me', {
-            credentials: 'include' // Important for sending cookies
-        });
-        
-        if (!response.ok) {
-            if (response.status === 401) {
-            window.location.href = '/login'; // Redirect if unauthorized
-            return;
-            }
-            throw new Error('Failed to fetch user data');
+        const cached = window.getCachedUser?.();
+        if (cached) {
+            return cached;
         }
-        
-        const user = await response.json();
-        console.log(user)
-        return user
-        } catch (error) {
-        console.error('Error fetching user:', error);
+        if (window.ensureAuthenticatedUser) {
+            return await window.ensureAuthenticatedUser();
+        }
         return null;
-        }
     }
 
     async function getUserSubmission() {

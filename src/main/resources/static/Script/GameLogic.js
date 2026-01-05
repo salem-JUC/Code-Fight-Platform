@@ -340,7 +340,7 @@ let game = null;
 window.onload = async () => {
     try {
         game = new GameLogic();
-        const user = await fetchCurrentUser();
+        const user = await getGuardedGameUser();
         
         if (!user) {
             console.warn('No user found. Redirecting to login page.');
@@ -357,25 +357,14 @@ window.onload = async () => {
 };
 
 
-
-
-async function fetchCurrentUser() {
-   try {
-     const response = await fetch('/api/auth/me', {
-       credentials: 'include'
-     });
-
-     if (!response.ok) {
-       console.warn('User authentication failed. Redirecting to login.');
-       window.location.href = '/login';
-       return null;
-     }
-     
-     const user = await response.json();
-     return user;
-   } catch (error) {
-     console.error('Error fetching current user:', error);
-     return null;
-   }
+async function getGuardedGameUser() {
+    const cached = window.getCachedUser?.();
+    if (cached) {
+        return cached;
+    }
+    if (window.ensureAuthenticatedUser) {
+        return await window.ensureAuthenticatedUser();
+    }
+    return null;
 }
 
