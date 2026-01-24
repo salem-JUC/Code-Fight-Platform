@@ -1,4 +1,4 @@
-INSERT IGNORE INTO Challenge (ChallengeID, Title, Description, Difficulty, Sample)
+INSERT IGNORE INTO challenge (challenge_id, title, description, difficulty, sample)
 VALUES
 (1, 'Sum of Two Numbers', 'Read two integers and print their sum.', 'Easy', 'Input: 3 5 Output: 8'),
 (2, 'Even or Odd', 'Reada number then print if an integer is even or odd.', 'Easy', 'Input: 4 Output: Even'),
@@ -16,7 +16,7 @@ VALUES
 (14, 'Count Letters in a String', 'Count the number of letters in a string (excluding spaces).', 'Hard', 'Input: hello world Output: 10'),
 (15, 'Capitalize First Letter', 'Convert the first character of a word to uppercase.', 'Hard', 'Input: hello Output: Hello');
 
-INSERT IGNORE INTO TestCase (testCaseID, ChallengeID, `input`, ExpectedOutput)
+INSERT IGNORE INTO test_case (test_case_id, challenge_id, `input`, expected_output)
 VALUES
 (1, 1, '3 5', '8'),
 (2, 1, '5 5', '10'),

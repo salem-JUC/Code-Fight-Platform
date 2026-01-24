@@ -29,8 +29,6 @@ public class SubmissionService {
     @Autowired
     TestCaseRepo testCaseRepo;
 
-    Long idIncrement = 1000L;
-
     public List<Submission> getAllSubmissionsOfChallenge(Long challengeId) {
         return submissionRepo.findByChallengeId(challengeId);
     }
@@ -46,8 +44,6 @@ public class SubmissionService {
     public Submission createSubmission(Long matchId ,  Long submitterId , String code) {
         Match match = matchRepo.findById(matchId);
         Submission submission = new Submission();
-        submission.setSubmissionID(idIncrement);
-        idIncrement++;
         submission.setCode(code);
         submission.setChallengeID(match.getCurrentChallengeId());
         submission.setProgrammingLanguage(match.getProgrammingLanguage());
@@ -55,7 +51,7 @@ public class SubmissionService {
         List<TestCase> testCases = testCaseRepo.findByChallengeId(match.getCurrentChallengeId());
         submission.setResult(evaluationModule.evaluate(submission , testCases));
         System.out.println("Submission evaluated: assigned" + submission.getResult());
-        submissionRepo.save(submission);
+        submission = submissionRepo.save(submission);
         System.out.println("Submission created: " + submission.getSubmissionID());
         return submission;
     }

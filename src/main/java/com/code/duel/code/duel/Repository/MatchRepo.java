@@ -12,7 +12,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.RowSet;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -24,30 +25,38 @@ public class MatchRepo {
     private JdbcTemplate jdbcTemplate;
 
     // Save a new match
-    public void save(Match match) {
-        String sql = "INSERT INTO `match` (matchID, current_challenge_id, difficulty, programmingLanguage,status, winnerId) VALUES (?,?,? ,?, ? ,?)";
+    public Match save(Match match) {
+        String sql = "INSERT INTO `match` (challenge_id, difficulty, programming_language, status, winner_id) VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setObject(1, match.getCurrentChallengeId());
+            ps.setString(2, match.getDifficulty());
+            ps.setString(3, match.getProgrammingLanguage());
+            ps.setString(4, match.getStatus());
+            ps.setObject(5, match.getWinnerId());
+            return ps;
+        }, keyHolder);
 
-        jdbcTemplate.update(sql,
-                match.getMatchID(),
-                match.getCurrentChallengeId(),
-                match.getDifficulty(),
-                match.getProgrammingLanguage(),
-                match.getStatus(),
-                match.getWinnerId());
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            match.setMatchID(key.longValue());
+        }
+        return match;
     }
 
     // Find a match by ID
     public Match findById(Long matchID) {
-        String sql = "SELECT * FROM `match` WHERE matchID = ?";
+        String sql = "SELECT * FROM `match` WHERE match_id = ?";
 
         return jdbcTemplate.queryForObject(sql, new Object[]{matchID}, (rs, rowNum) ->
                 new Match(
-                        rs.getLong("matchID"),
-                        rs.getLong("current_challenge_id"),
+                        rs.getLong("match_id"),
+                        rs.getLong("challenge_id"),
                         rs.getString("difficulty"),
-                        rs.getString("programmingLanguage"),
+                        rs.getString("programming_language"),
                         rs.getString("status"),
-                        rs.getLong("winnerId")
+                        rs.getLong("winner_id")
                 ));
 
     }
@@ -57,18 +66,18 @@ public class MatchRepo {
         String sql = "SELECT * FROM `match`";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
-                        rs.getLong("matchID"),
-                        rs.getLong("current_challenge_id"),
+                        rs.getLong("match_id"),
+                        rs.getLong("challenge_id"),
                         rs.getString("difficulty"),
-                        rs.getString("programmingLanguage"),
+                        rs.getString("programming_language"),
                         rs.getString("status"),
-                        rs.getLong("matchID")
+                        rs.getLong("winner_id")
                 ));
     }
 
     // Update a match (including challenge ID)
     public void update(Match match) {
-        String sql = "UPDATE `match` SET status = ?, current_challenge_id = ?, winnerId = ? WHERE matchID = ?";
+        String sql = "UPDATE `match` SET status = ?, challenge_id = ?, winner_id = ? WHERE match_id = ?";
         jdbcTemplate.update(sql,
                 match.getStatus(),
                 match.getCurrentChallengeId(),
@@ -79,13 +88,13 @@ public class MatchRepo {
 
     // Update only the current challenge ID
     public void updateChallenge(Long matchId, Long challengeId) {
-        String sql = "UPDATE `match` SET current_challenge_id = ? WHERE matchID = ?";
+        String sql = "UPDATE `match` SET challenge_id = ? WHERE match_id = ?";
         jdbcTemplate.update(sql, challengeId, matchId);
     }
 
     // Delete a match by ID
     public void deleteById(Long matchID) {
-        String sql = "DELETE FROM `match` WHERE matchID = ?";
+        String sql = "DELETE FROM `match` WHERE match_id = ?";
         jdbcTemplate.update(sql, matchID);
     }
 
@@ -94,121 +103,118 @@ public class MatchRepo {
         String sql = "SELECT * FROM `match` WHERE status = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
-                        rs.getLong("matchID"),
-                        rs.getLong("current_challenge_id"),
+                        rs.getLong("match_id"),
+                        rs.getLong("challenge_id"),
                         rs.getString("difficulty"),
-                        rs.getString("programmingLanguage"),
+                        rs.getString("programming_language"),
                         rs.getString("status"),
-                        rs.getLong("winnerId")
+                        rs.getLong("winner_id")
                 ));
     }
 
     // Find first pending match
     public Optional<Match> findFirstPending() {
-        String sql = "SELECT * FROM `match` WHERE status = 'PENDING' ORDER BY matchID ASC LIMIT 1";
+        String sql = "SELECT * FROM `match` WHERE status = 'PENDING' ORDER BY match_id ASC LIMIT 1";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Match(
-                        rs.getLong("matchID"),
-                        rs.getLong("current_challenge_id"),
+                        rs.getLong("match_id"),
+                        rs.getLong("challenge_id"),
                         rs.getString("difficulty"),
-                        rs.getString("programmingLanguage"),
+                        rs.getString("programming_language"),
                         rs.getString("status"),
-                        rs.getLong("winnerId")
+                        rs.getLong("winner_id")
                 )).stream().findFirst();
     }
 
     public List<Match> findAllMatchesByUserIdOrderByRecent(Long userId) {
         String sql = """
-            SELECT m.matchID, m.current_challenge_id, m.difficulty, 
-                   m.programmingLanguage, m.status, m.winnerId
+            SELECT m.match_id, m.challenge_id, m.difficulty, 
+                   m.programming_language, m.status, m.winner_id
             FROM `match` m
-            JOIN user_play_match upm ON m.matchID = upm.matchID
-            WHERE upm.userID = ?
-            ORDER BY m.matchID DESC
+            JOIN user_play_match upm ON m.match_id = upm.match_id
+            WHERE upm.user_id = ?
+            ORDER BY m.match_id DESC
             """;
 
         return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) -> {
             Match match = new Match();
-            match.setMatchID(rs.getLong("matchID"));
-            match.setCurrentChallengeId(rs.getLong("current_challenge_id"));
+            match.setMatchID(rs.getLong("match_id"));
+            match.setCurrentChallengeId(rs.getLong("challenge_id"));
             match.setDifficulty(rs.getString("difficulty"));
-            match.setProgrammingLanguage(rs.getString("programmingLanguage"));
+            match.setProgrammingLanguage(rs.getString("programming_language"));
             match.setStatus(rs.getString("status"));
-            match.setWinnerId(rs.getLong("winnerId"));
+            match.setWinnerId(rs.getLong("winner_id"));
             return match;
         });
     }
 
     public List<Match> findAllMatchesWinnedByUserIdOrderByRecent(Long userId) {
         String sql = """
-            SELECT m.matchID, m.current_challenge_id, m.difficulty, 
-                   m.programmingLanguage, m.status, m.winnerId
+            SELECT m.match_id, m.challenge_id, m.difficulty, 
+                   m.programming_language, m.status, m.winner_id
             FROM `match` m
-            WHERE m.winnerId = ?
-            ORDER BY m.matchID DESC
+            WHERE m.winner_id = ?
+            ORDER BY m.match_id DESC
             """;
 
         return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) -> {
             Match match = new Match();
-            match.setMatchID(rs.getLong("matchID"));
-            match.setCurrentChallengeId(rs.getLong("current_challenge_id"));
+            match.setMatchID(rs.getLong("match_id"));
+            match.setCurrentChallengeId(rs.getLong("challenge_id"));
             match.setDifficulty(rs.getString("difficulty"));
-            match.setProgrammingLanguage(rs.getString("programmingLanguage"));
+            match.setProgrammingLanguage(rs.getString("programming_language"));
             match.setStatus(rs.getString("status"));
-            match.setWinnerId(rs.getLong("winnerId"));
+            match.setWinnerId(rs.getLong("winner_id"));
             return match;
         });
     }
 
-    public MatchStatusResponseMapper queryMatchStatus(Long matchId , Long playerId){
+    public MatchStatusResponseMapper queryMatchStatus(Long matchId, Long playerId) {
         String sql = """
-                select m.DIFFICULTY ,
-                m.PROGRAMMINGLANGUAGE ,
-                c.TITLE ,
-                c.DESCRIPTION ,
-                c.DIFFICULTY ,
-                c.SAMPLE ,
-                fupm.USERNAME as PlayerName ,
-                fupm.USERSCORE as PlayerScore ,
-                fupm.USERID as PlayerId ,
-                supm.USERNAME as SecondName ,
-                supm.USERSCORE  as SecondScore ,
-                supm.USERID as SecondId
-                from `match` as m
-                join CHALLENGE as c ON c.CHALLENGEID = m.CURRENT_CHALLENGE_ID
-                join USER_PLAY_MATCH  as fupm ON fupm.MATCHID = m.MATCHID AND fupm.USERID = ?
-                join USER_PLAY_MATCH  as supm ON supm.MATCHID = m.MATCHID AND supm.USERID != ?
-                where m.MATCHID = ?;
-                """;
+            SELECT m.difficulty,
+                   m.programming_language,
+                   c.title,
+                   c.description,
+                   c.sample,
+                   fupm.username AS player_name,
+                   fupm.user_score AS player_score,
+                   fupm.user_id AS player_id,
+                   supm.username AS second_name,
+                   supm.user_score AS second_score,
+                   supm.user_id AS second_id
+            FROM `match` AS m
+            JOIN challenge AS c ON c.challenge_id = m.challenge_id
+            JOIN user_play_match AS fupm ON fupm.match_id = m.match_id AND fupm.user_id = ?
+            JOIN user_play_match AS supm ON supm.match_id = m.match_id AND supm.user_id != ?
+            WHERE m.match_id = ?;
+            """;
 
         return jdbcTemplate.query(sql, rs -> {
-            // .next() moves the cursor to the first row and returns false if empty
             if (rs.next()) {
                 return new MatchStatusResponseMapper(
-                        rs.getString("DIFFICULTY"),
-                        rs.getString("PROGRAMMINGLANGUAGE"),
-                        rs.getString("TITLE"),
-                        rs.getString("DESCRIPTION"),
-                        rs.getString("SAMPLE"),
-                        rs.getString("PlayerName"),
-                        rs.getInt("PlayerScore"),
-                        rs.getLong("PlayerId"),
-                        rs.getString("SecondName"),
-                        rs.getInt("SecondScore"),
-                        rs.getLong("SecondId")
+                        rs.getString("difficulty"),
+                        rs.getString("programming_language"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getString("sample"),
+                        rs.getString("player_name"),
+                        rs.getInt("player_score"),
+                        rs.getLong("player_id"),
+                        rs.getString("second_name"),
+                        rs.getInt("second_score"),
+                        rs.getLong("second_id")
                 );
             }
-            else
-                return null; // Return null if match not found
+            return null;
         }, playerId, playerId, matchId);
     }
 
     public Long findRunningMatchOfUser(Long userId){
-        String sql = "select m.MATCHID from `match` as m\n" +
-                "join USER_PLAY_MATCH as upm ON upm.MATCHID = m.MATCHID AND upm.USERID = ? AND m.STATUS = 'RUNNING';";
+        String sql = "select m.match_id from `match` as m\n" +
+                "join user_play_match as upm ON upm.match_id = m.match_id AND upm.user_id = ? AND m.status = 'RUNNING';";
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sql , userId);
         if (rs.next()){
-            return rs.getLong("MATCHID");
+            return rs.getLong("match_id");
         }
         return null;
     }

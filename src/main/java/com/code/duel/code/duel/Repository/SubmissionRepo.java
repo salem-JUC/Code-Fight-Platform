@@ -6,9 +6,13 @@ import com.code.duel.code.duel.DTO.SubmissionDTO.SubmissionWithUserDTO;
 import com.code.duel.code.duel.Model.Submission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,67 +22,83 @@ public class SubmissionRepo {
     private JdbcTemplate jdbcTemplate;
 
     // Save a new submission
-    public void save(Submission submission) {
-        String sql = "INSERT INTO Submission (submissionID, ChallengeID, submitterID, Result, Code, ProgrammingLanguage) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, submission.getSubmissionID(), submission.getChallengeID(), submission.getSubmitterID(), submission.getResult(), submission.getCode(), submission.getProgrammingLanguage());
+    public Submission save(Submission submission) {
+        String sql = "INSERT INTO submission (challenge_id, submitter_id, result, code, programming_language) VALUES (?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, submission.getChallengeID());
+            ps.setLong(2, submission.getSubmitterID());
+            ps.setString(3, submission.getResult());
+            ps.setString(4, submission.getCode());
+            ps.setString(5, submission.getProgrammingLanguage());
+            return ps;
+        }, keyHolder);
 
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            submission.setSubmissionID(key.longValue());
+        }
+        return submission;
     }
 
     // Find a submission by ID
     public Submission findById(Long submissionID) {
-        String sql = "SELECT * FROM Submission WHERE submissionID = ?";
+        String sql = "SELECT * FROM submission WHERE submission_id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{submissionID}, (rs, rowNum) ->
                 new Submission(
-                        rs.getLong("submissionID"),
-                        rs.getLong("ChallengeID"),
-                        rs.getLong("submitterID"),
-                        rs.getString("Result"),
-                        rs.getString("Code"),
-                        rs.getString("ProgrammingLanguage")
+                        rs.getLong("submission_id"),
+                        rs.getLong("challenge_id"),
+                        rs.getLong("submitter_id"),
+                        rs.getString("result"),
+                        rs.getString("code"),
+                        rs.getString("programming_language")
                 ));
     }
 
     // Find all submissions for a challenge
     public List<Submission> findByChallengeId(Long challengeID) {
-        String sql = "SELECT * FROM Submission WHERE ChallengeID = ?";
+        String sql = "SELECT * FROM submission WHERE challenge_id = ?";
         return jdbcTemplate.query(sql, new Object[]{challengeID}, (rs, rowNum) ->
                 new Submission(
-                        rs.getLong("submissionID"),
-                        rs.getLong("ChallengeID"),
-                        rs.getLong("submitterID"),
-                        rs.getString("Result"),
-                        rs.getString("Code"),
-                        rs.getString("ProgrammingLanguage")
+                        rs.getLong("submission_id"),
+                        rs.getLong("challenge_id"),
+                        rs.getLong("submitter_id"),
+                        rs.getString("result"),
+                        rs.getString("code"),
+                        rs.getString("programming_language")
                 ));
     }
 
     public List<Submission> findBysubmitterId(Long submitterId) {
-        String sql = "SELECT * FROM Submission WHERE SUBMITTERID  = ?";
+        String sql = "SELECT * FROM submission WHERE submitter_id = ?";
         return jdbcTemplate.query(sql, new Object[]{submitterId}, (rs, rowNum) ->
                 new Submission(
-                        rs.getLong("submissionID"),
-                        rs.getLong("ChallengeID"),
-                        rs.getLong("submitterID"),
-                        rs.getString("Result"),
-                        rs.getString("Code"),
-                        rs.getString("ProgrammingLanguage")
+                        rs.getLong("submission_id"),
+                        rs.getLong("challenge_id"),
+                        rs.getLong("submitter_id"),
+                        rs.getString("result"),
+                        rs.getString("code"),
+                        rs.getString("programming_language")
                 ));
     }
 
     public List<SubmissionDTO> getSubmissionsOfUser(Long userId){
-        String sql = "select s.SUBMISSIONID , c.TITLE  , c.DIFFICULTY , s.PROGRAMMINGLANGUAGE , s.RESULT \n" +
-                "from SUBMISSION  s\n" +
-                "inner join CHALLENGE c on s.CHALLENGEID = c.CHALLENGEID\n" +
-                "where s.SUBMITTERID = ? ;";
+        String sql = """
+                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result
+                from submission s
+                inner join challenge c on s.challenge_id = c.challenge_id
+                where s.submitter_id = ?;
+                """;
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql , userId);
         List<SubmissionDTO> submissions = new ArrayList<>();
         while (rowSet.next()){
             SubmissionDTO submission = new SubmissionDTO(
-                    rowSet.getLong("SUBMISSIONID"),
-                    rowSet.getString("TITLE"),
-                    rowSet.getString("DIFFICULTY"),
-                    rowSet.getString("PROGRAMMINGLANGUAGE"),
-                    rowSet.getString("RESULT")
+                    rowSet.getLong("submission_id"),
+                    rowSet.getString("title"),
+                    rowSet.getString("difficulty"),
+                    rowSet.getString("programming_language"),
+                    rowSet.getString("result")
             );
             submissions.add(submission);
         }
@@ -87,23 +107,23 @@ public class SubmissionRepo {
 
     // Update a submission
     public void update(Submission submission) {
-        String sql = "UPDATE Submission SET ChallengeID = ?, submitterID = ?, Result = ?, Code = ?, ProgrammingLanguage = ? WHERE submissionID = ?";
+        String sql = "UPDATE submission SET challenge_id = ?, submitter_id = ?, result = ?, code = ?, programming_language = ? WHERE submission_id = ?";
         jdbcTemplate.update(sql, submission.getChallengeID(), submission.getSubmitterID(), submission.getResult(), submission.getCode(), submission.getProgrammingLanguage(), submission.getSubmissionID());
     }
 
     // Delete a submission by ID
     public void deleteById(Long submissionID) {
-        String sql = "DELETE FROM Submission WHERE submissionID = ?";
+        String sql = "DELETE FROM submission WHERE submission_id = ?";
         jdbcTemplate.update(sql, submissionID);
     }
 
     public SubmissionDetailsDTO getSubmissionDetails(Long submissionId) {
         String sql = """
-                select u.USERNAME , s.CODE , s.RESULT , s.PROGRAMMINGLANGUAGE , c.TITLE , c.DESCRIPTION , c.DIFFICULTY , c.ChallengeID
-                from SUBMISSION s
-                inner join `user` u on s.SUBMITTERID = u.USERID
-                inner join CHALLENGE c on s.CHALLENGEID = c.CHALLENGEID
-                where s.SUBMISSIONID = ? ;
+                select u.username, s.code, s.result, s.programming_language, c.title, c.description, c.difficulty, c.challenge_id
+                from submission s
+                inner join `user` u on s.submitter_id = u.user_id
+                inner join challenge c on s.challenge_id = c.challenge_id
+                where s.submission_id = ?;
                 """;
 
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql , submissionId);
@@ -111,14 +131,14 @@ public class SubmissionRepo {
         if (rowSet.next()){
             submissionDetailsDTO =
                     new SubmissionDetailsDTO(
-                            rowSet.getString("USERNAME"),
-                            rowSet.getString("CODE"),
-                            rowSet.getString("RESULT"),
-                            rowSet.getString("PROGRAMMINGLANGUAGE"),
-                            rowSet.getString("TITLE"),
-                            rowSet.getString("DESCRIPTION"),
-                            rowSet.getString("DIFFICULTY"),
-                            rowSet.getLong("CHALLENGEID")
+                            rowSet.getString("username"),
+                            rowSet.getString("code"),
+                            rowSet.getString("result"),
+                            rowSet.getString("programming_language"),
+                            rowSet.getString("title"),
+                            rowSet.getString("description"),
+                            rowSet.getString("difficulty"),
+                            rowSet.getLong("challenge_id")
                     );
         }
         return submissionDetailsDTO;
@@ -126,11 +146,11 @@ public class SubmissionRepo {
 
     public List<SubmissionWithUserDTO> getAllSubmissionsWithUsernames(Long challengeId) {
         String sql = """
-                select u.USERNAME , s.SUBMISSIONID , c.TITLE , c.DIFFICULTY , s.PROGRAMMINGLANGUAGE , s.RESULT\s
-                from SUBMISSION s
-                join `user` u on u.USERID = s.SUBMITTERID\s
-                join CHALLENGE c on c.CHALLENGEID = s.CHALLENGEID\s
-                where c.CHALLENGEID = ? ;
+                select u.username, s.submission_id, c.title, c.difficulty, s.programming_language, s.result
+                from submission s
+                join `user` u on u.user_id = s.submitter_id
+                join challenge c on c.challenge_id = s.challenge_id
+                where c.challenge_id = ?;
                 """;
 
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, challengeId);
@@ -138,12 +158,12 @@ public class SubmissionRepo {
         while (rowSet.next()){
             SubmissionWithUserDTO submission =
                     new SubmissionWithUserDTO(
-                            rowSet.getString("USERNAME"),
-                            rowSet.getLong("SUBMISSIONID"),
-                            rowSet.getString("TITLE"),
-                            rowSet.getString("DIFFICULTY"),
-                            rowSet.getString("PROGRAMMINGLANGUAGE"),
-                            rowSet.getString("RESULT")
+                            rowSet.getString("username"),
+                            rowSet.getLong("submission_id"),
+                            rowSet.getString("title"),
+                            rowSet.getString("difficulty"),
+                            rowSet.getString("programming_language"),
+                            rowSet.getString("result")
                     );
             submissions.add(submission);
         }

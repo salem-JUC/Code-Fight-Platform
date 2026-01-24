@@ -1,61 +1,66 @@
+DROP DATABASE IF EXISTS code_duel;
 CREATE DATABASE IF NOT EXISTS code_duel;
 USE code_duel;
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
-    userID BIGINT PRIMARY KEY,
-    Username VARCHAR(255) UNIQUE,
-    Email VARCHAR(255) UNIQUE,
-    Password VARCHAR(255),
-    Role ENUM('PLAYER', 'ADMIN') NOT NULL,
-    Score INT
+    user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100) UNIQUE,
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role VARCHAR(50),
+    score INT
 );
 
-CREATE TABLE IF NOT EXISTS Challenge (
-    ChallengeID BIGINT PRIMARY KEY,
-    Title VARCHAR(255),
-    Description VARCHAR(255),
-    Difficulty ENUM('Easy', 'Normal', 'Hard') NOT NULL,
-    Sample VARCHAR(255)
+DROP TABLE IF EXISTS challenge;
+CREATE TABLE IF NOT EXISTS challenge (
+    challenge_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255),
+    description TEXT,
+    difficulty VARCHAR(50),
+    sample TEXT
 );
 
--- Create Match table
+DROP TABLE IF EXISTS `match`;
 CREATE TABLE IF NOT EXISTS `match` (
-    matchID BIGINT PRIMARY KEY,
-    current_challenge_id BIGINT,
+    match_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    challenge_id BIGINT,
     difficulty VARCHAR(255),
-    programmingLanguage VARCHAR(255),
+    programming_language VARCHAR(50),
     status ENUM('PENDING', 'RUNNING', 'FINISHED') NOT NULL,
-    winnerId BIGINT,
-    FOREIGN KEY (current_challenge_id) REFERENCES Challenge(ChallengeID)
+    winner_id BIGINT,
+    FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id)
 );
 
--- Create TestCase table
-CREATE TABLE IF NOT EXISTS TestCase (
-    testCaseID BIGINT PRIMARY KEY,
-    ChallengeID BIGINT,
+DROP TABLE IF EXISTS test_case;
+CREATE TABLE IF NOT EXISTS test_case (
+    test_case_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    challenge_id BIGINT,
     `input` VARCHAR(255),
-    ExpectedOutput VARCHAR(255),
-    FOREIGN KEY (ChallengeID) REFERENCES Challenge(ChallengeID)
+    expected_output VARCHAR(255),
+    FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id)
 );
 
+DROP TABLE IF EXISTS user_play_match;
 CREATE TABLE IF NOT EXISTS user_play_match (
-    userID BIGINT,
-    matchID BIGINT,
+    user_id BIGINT,
+    match_id BIGINT,
     username VARCHAR(255),
-    userScore INT,
-    PRIMARY KEY (userID, matchID),
-    FOREIGN KEY (userID) REFERENCES `user`(userID),
-    FOREIGN KEY (matchID) REFERENCES `match`(matchID)
+    user_score INT,
+    PRIMARY KEY (user_id, match_id),
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id),
+    FOREIGN KEY (match_id) REFERENCES `match`(match_id)
 );
 
--- Create Submission table
-CREATE TABLE IF NOT EXISTS Submission (
-    submissionID BIGINT PRIMARY KEY,
-    ChallengeID BIGINT,
-    submitterID BIGINT,
-    Result VARCHAR(255),
-    Code TEXT,
-    ProgrammingLanguage VARCHAR(255),
-    FOREIGN KEY (ChallengeID) REFERENCES Challenge(ChallengeID),
-    FOREIGN KEY (submitterID) REFERENCES `user`(userID)
+DROP TABLE IF EXISTS submission;
+CREATE TABLE IF NOT EXISTS submission (
+    submission_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    challenge_id BIGINT,
+    submitter_id BIGINT,
+    result VARCHAR(100),
+    code TEXT,
+    programming_language VARCHAR(50),
+    FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id),
+    FOREIGN KEY (submitter_id) REFERENCES `user`(user_id)
 );
+

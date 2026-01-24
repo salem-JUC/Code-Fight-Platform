@@ -33,17 +33,14 @@ public class MatchService {
 
     private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
-    long idIncrement = 1000;
     public Match createMatch(Long playerId , String difficulty , String programmingLanguage){
         logger.info("Creating match with player ID: {}, difficulty: {}, programming language: {}", playerId, difficulty, programmingLanguage);
         Match newMatch = new Match();
         newMatch.setStatus("PENDING");
-        newMatch.setMatchID(idIncrement);
         newMatch.setDifficulty(difficulty);
         newMatch.setProgrammingLanguage(programmingLanguage);
         newMatch.setWinnerId(0L);
-        idIncrement++;
-        matchRepo.save(newMatch);
+        newMatch = matchRepo.save(newMatch);
 
         UserPlayMatch userPlayMatch1 = new UserPlayMatch();
         userPlayMatch1.setUserID(playerId);

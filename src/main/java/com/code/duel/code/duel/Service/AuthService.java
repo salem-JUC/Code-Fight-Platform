@@ -11,16 +11,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 @Service
 public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final AtomicLong idGenerator = new AtomicLong(1004L);
-
     @Autowired
     public AuthService(UserRepo userRepo, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
@@ -34,17 +30,15 @@ public class AuthService {
             throw new UsernameAlreadyTakenException(request.getUsername());
         }
 
-        long userId = idGenerator.getAndIncrement();
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setRole("PLAYER");
-        newUser.setUserID(userId);
         newUser.setScore(0);
 
         try {
-            userRepo.save(newUser);
+            newUser = userRepo.save(newUser);
         } catch (DataAccessException e) {
             
             logger.info("User registration failed with username: {}", request.getUsername());
