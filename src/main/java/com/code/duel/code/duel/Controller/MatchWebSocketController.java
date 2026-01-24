@@ -11,6 +11,7 @@ import com.code.duel.code.duel.Model.Submission;
 import com.code.duel.code.duel.Model.User;
 import com.code.duel.code.duel.Model.UserPlayMatch;
 import com.code.duel.code.duel.Service.MatchService;
+import com.code.duel.code.duel.Service.PendingService;
 import com.code.duel.code.duel.Service.SubmissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class MatchWebSocketController {
     private final SimpMessagingTemplate messagingTemplate;
     private final MatchService matchService;
     private final SubmissionService submissionService;
+    private final PendingService pendingService;
 
 
     private static final Logger logger = LoggerFactory.getLogger(MatchWebSocketController.class);
@@ -44,10 +46,12 @@ public class MatchWebSocketController {
     @Autowired
     public MatchWebSocketController(SimpMessagingTemplate messagingTemplate,
                                     MatchService matchService,
-                                    SubmissionService submissionService) {
+                                    SubmissionService submissionService,
+                                    PendingService pendingService) {
         this.messagingTemplate = messagingTemplate;
         this.matchService = matchService;
         this.submissionService = submissionService;
+        this.pendingService = pendingService;
     }
 
     @MessageMapping("/match/{matchId}/submit")
@@ -76,6 +80,8 @@ public class MatchWebSocketController {
         logger.info("Player {} is quitting match {}", user.getUsername(), matchId);
         UserPlayMatch winner = matchService.getTheOpponent(matchId ,user.getUserID() );
         matchService.endMatch(matchId, winner.getUserID());
+        pendingService.removeIfPending(user.getUserID());
+        pendingService.removeIfPending(winner.getUserID());
         broadcastMatchEnd(matchId, winner.getUserID(), winner.getUsername());
     }
 

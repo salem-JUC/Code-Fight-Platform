@@ -7,11 +7,11 @@ import com.code.duel.code.duel.Service.PendingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.tags.form.SelectTag;
 
 import java.util.Set;
 
@@ -46,13 +46,21 @@ public class PendingHandlerJanitor {
 
     private void performQuitLogic(Long userId) {
         Long matchId = matchService.getOnlyRunningMatchIdOfUser(userId);
-        UserPlayMatch winner = matchService.getTheOpponent(matchId , userId);
-        matchService.endMatch(matchId , winner.getUserID());
-        messagingTemplate.convertAndSend(
-                "/topic/match/" + matchId + "/ended",
-                new MatchResult(winner.getUserID(), winner.getUsername())
-        );
-    }
+        if (matchId == null) {
+            logger.debug("No running match for expired user {}, skipping cleanup", userId);
+            return;
+        }
 
+        try {
+            UserPlayMatch winner = matchService.getTheOpponent(matchId , userId);
+            matchService.endMatch(matchId , winner.getUserID());
+            messagingTemplate.convertAndSend(
+                    "/topic/match/" + matchId + "/ended",
+                    new MatchResult(winner.getUserID(), winner.getUsername())
+            );
+        } catch (EmptyResultDataAccessException e) {
+            logger.info("Expired user {} could not resolve opponent in match {}, skipping cleanup", userId, matchId);
+        }
+    }
 
 }
