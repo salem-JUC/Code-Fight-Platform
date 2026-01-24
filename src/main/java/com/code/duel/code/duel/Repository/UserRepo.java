@@ -90,4 +90,17 @@ public class UserRepo {
                         rs.getInt("score")
                 )).stream().findFirst();
     }
+
+    public Optional<User> findByEmail(String email) {
+        String sql = "SELECT * FROM `user` WHERE email = ?";
+        return jdbcTemplate.query(sql, new Object[]{email}, (rs, rowNum) ->
+                new User(
+                        rs.getLong("user_id"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("role"),
+                        rs.getInt("score")
+                )).stream().findFirst();
+    }
 }

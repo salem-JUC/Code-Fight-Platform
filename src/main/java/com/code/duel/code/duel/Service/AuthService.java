@@ -3,6 +3,7 @@ package com.code.duel.code.duel.Service;
 import com.code.duel.code.duel.Mappers.RequestMapper.UserRegisterRequest;
 import com.code.duel.code.duel.Model.User;
 import com.code.duel.code.duel.Repository.UserRepo;
+import com.code.duel.code.duel.Exception.EmailAlreadyRegisteredException;
 import com.code.duel.code.duel.Exception.UsernameAlreadyTakenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,10 @@ public class AuthService {
 
         if (userRepo.findByUsername(request.getUsername()).isPresent()) {
             throw new UsernameAlreadyTakenException(request.getUsername());
+        }
+
+        if (userRepo.findByEmail(request.getEmail()).isPresent()) {
+            throw new EmailAlreadyRegisteredException(request.getEmail());
         }
 
         User newUser = new User();

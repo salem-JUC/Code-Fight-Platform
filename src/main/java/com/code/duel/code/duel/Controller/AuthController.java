@@ -3,6 +3,7 @@ package com.code.duel.code.duel.Controller;
 import com.code.duel.code.duel.Mappers.RequestMapper.UserRegisterRequest;
 import com.code.duel.code.duel.Model.User;
 import com.code.duel.code.duel.Service.AuthService;
+import com.code.duel.code.duel.Exception.EmailAlreadyRegisteredException;
 import com.code.duel.code.duel.Exception.UsernameAlreadyTakenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,9 @@ public class AuthController {
             return ResponseEntity.created(null).body(newUser);
         } catch (UsernameAlreadyTakenException e) {
             logger.info("Username already taken: {}", request.getUsername());
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (EmailAlreadyRegisteredException e) {
+            logger.info("Email already registered: {}", request.getEmail());
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (DataAccessException e) {
             logger.info("User registration failed with username: {}", request.getUsername());
