@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS code_duel;
+
 CREATE DATABASE IF NOT EXISTS code_duel;
 USE code_duel;
 
-DROP TABLE IF EXISTS `user`;
+
 CREATE TABLE IF NOT EXISTS `user` (
     user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) UNIQUE,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     score INT
 );
 
-DROP TABLE IF EXISTS challenge;
+
 CREATE TABLE IF NOT EXISTS challenge (
     challenge_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255),
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS challenge (
     sample TEXT
 );
 
-DROP TABLE IF EXISTS `match`;
+
 CREATE TABLE IF NOT EXISTS `match` (
     match_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     challenge_id BIGINT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `match` (
     FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id)
 );
 
-DROP TABLE IF EXISTS test_case;
+
 CREATE TABLE IF NOT EXISTS test_case (
     test_case_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     challenge_id BIGINT,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS test_case (
     FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id)
 );
 
-DROP TABLE IF EXISTS user_play_match;
+
 CREATE TABLE IF NOT EXISTS user_play_match (
     user_id BIGINT,
     match_id BIGINT,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS user_play_match (
     FOREIGN KEY (match_id) REFERENCES `match`(match_id)
 );
 
-DROP TABLE IF EXISTS submission;
+
 CREATE TABLE IF NOT EXISTS submission (
     submission_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     challenge_id BIGINT,
