@@ -22,10 +22,10 @@ public class EvaluationModule {
         logger.info("Evaluating submission: {} by user id: {}", submission.getSubmissionID(), submission.getSubmitterID());
         int languageId =0;
         if (submission.getProgrammingLanguage().equals("Java")) {
-            languageId =91;
+            languageId =62;
         }
         else if (submission.getProgrammingLanguage().equals("Python")) {
-            languageId=109;
+            languageId=71;
         }
 
         for (int i = 0; i < testCases.size(); i++) {
