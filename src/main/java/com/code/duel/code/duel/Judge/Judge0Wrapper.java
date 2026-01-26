@@ -40,9 +40,7 @@ public class Judge0Wrapper {
 
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://judge0-extra-ce.p.rapidapi.com/submissions?base64_encoded=true&wait=true&fields=*"))
-                .header("x-rapidapi-key", JUDGE0API_KEY)
-                .header("x-rapidapi-host", "judge0-ce.p.rapidapi.com")
+                .uri(URI.create("https://127.0.0.1:2358/submissions?base64_encoded=true&wait=true&fields=*"))
                 .header("Content-Type", "application/json")
                 .method("POST", HttpRequest.BodyPublishers.ofString(jsonPayload)
                 )
