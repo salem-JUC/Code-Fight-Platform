@@ -1,20 +1,20 @@
 INSERT IGNORE INTO challenge (challenge_id, title, description, difficulty, sample)
 VALUES
-(1, 'Sum of Two Numbers', 'Read two integers and print their sum.', 'Easy', 'Input: 3 5 Output: 8'),
-(2, 'Even or Odd', 'Reada number then print if an integer is even or odd.', 'Easy', 'Input: 4 Output: Even'),
-(3, 'Maximum of Two Numbers', 'Read two numbers then Print the larger of two numbers.', 'Easy', 'Input: 7 9 Output: 9'),
-(4, 'Area of a Rectangle', 'Read the length and width of a rectangle and calculate its area.', 'Easy', 'Input: 5 3 Output: 15'),
-(5, 'Convert Minutes to Seconds', 'Convert a number of minutes to seconds.', 'Easy', 'Input: 5 Output: 300'),
-(6, 'Fibonacci Sequence', 'Generate the nth Fibonacci number.', 'Normal', 'Input: 5 Output: 5'),
-(7, 'Reverse a String', 'Read a string and print its reverse.', 'Normal', 'Input: hello Output: olleh'),
-(8, 'Count Vowels in a Word', 'Count how many vowels are in a given lowercase word.', 'Normal', 'Input: banana Output: 3'),
-(9, 'Square a Number', 'Read a number and output its square.', 'Normal', 'Input: 4 Output: 16'),
-(10, 'Find Smallest of Three Numbers', 'Given three integers, print the smallest.', 'Normal', 'Input: 3 1 2 Output: 1'),
-(11, 'Sum of Digits', 'Read a number and print the sum of its digits.', 'Hard', 'Input: 1234 Output: 10'),
-(12, 'Check for Palindrome Number', 'Check if a number reads the same backward.', 'Hard', 'Input: 121 Output: Yes'),
-(13, 'Print Multiples of 3 up to N', 'Print all numbers divisible by 3 up to a number n.', 'Hard', 'Input: 10 Output: 3 6 9'),
-(14, 'Count Letters in a String', 'Count the number of letters in a string (excluding spaces).', 'Hard', 'Input: hello world Output: 10'),
-(15, 'Capitalize First Letter', 'Convert the first character of a word to uppercase.', 'Hard', 'Input: hello Output: Hello');
+(1, 'Sum of Two Numbers', 'Read two integers from standard input (e.g., using input() or Scanner) and print their sum to standard output.', 'Easy', 'Input: 3 5 Output: 8'),
+(2, 'Even or Odd', 'Read an integer from standard input and print "Even" if the number is even, or "Odd" if it is odd.', 'Easy', 'Input: 4 Output: Even'),
+(3, 'Maximum of Two Numbers', 'Read two integers from standard input and print the larger of the two to standard output.', 'Easy', 'Input: 7 9 Output: 9'),
+(4, 'Area of a Rectangle', 'Read the length and width of a rectangle from standard input and print its calculated area.', 'Easy', 'Input: 5 3 Output: 15'),
+(5, 'Convert Minutes to Seconds', 'Read an integer representing minutes from standard input and print the equivalent value in seconds.', 'Easy', 'Input: 5 Output: 300'),
+(6, 'Fibonacci Sequence', 'Read an integer n from standard input and print the nth Fibonacci number to standard output.', 'Normal', 'Input: 5 Output: 5'),
+(7, 'Reverse a String', 'Read a string from standard input and print the characters in reverse order to standard output.', 'Normal', 'Input: hello Output: olleh'),
+(8, 'Count Vowels in a Word', 'Read a lowercase word from standard input and print the total count of vowels (a, e, i, o, u) found in it.', 'Normal', 'Input: banana Output: 3'),
+(9, 'Square a Number', 'Read a number from standard input and print its square value to standard output.', 'Normal', 'Input: 4 Output: 16'),
+(10, 'Find Smallest of Three Numbers', 'Read three integers from standard input and print the smallest value among them.', 'Normal', 'Input: 3 1 2 Output: 1'),
+(11, 'Sum of Digits', 'Read an integer from standard input and print the sum of its individual digits.', 'Hard', 'Input: 1234 Output: 10'),
+(12, 'Check for Palindrome Number', 'Read an integer from standard input and print "true" if it reads the same backward, otherwise print "false".', 'Hard', 'Input: 121 Output: true'),
+(14, 'Count Letters in a String', 'Read a string from standard input and print the total number of letters it contains, excluding any spaces.', 'Hard', 'Input: hello world Output: 10'),
+(15, 'Capitalize First Letter', 'Read a lowercase word from standard input and print the same word with the first letter capitalized.', 'Hard', 'Input: hello Output: Hello');
+
 
 INSERT IGNORE INTO test_case (test_case_id, challenge_id, `input`, expected_output)
 VALUES
@@ -42,8 +42,6 @@ VALUES
 (22, 11, '405', '9'),
 (23, 12, '121', 'true'),
 (24, 12, '5665', 'true'),
-(25, 13, '10', '3 6 9'),
-(26, 13, '15', '3 6 9 12 15'),
 (27, 14, 'hello world', '10'),
 (28, 14, 'code duel platform', '16'),
 (29, 15, 'hello', 'Hello'),
