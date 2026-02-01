@@ -41,7 +41,7 @@ public class SecurityConfiguration {
                 })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/Login.html" , "/index.html").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**" , "/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
