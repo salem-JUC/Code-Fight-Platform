@@ -10,7 +10,9 @@ public class SubmissionDetailsDTO {
         private String description;
         private String difficulty;
         private Long challengeId;
-        public SubmissionDetailsDTO(String username, String code, String result, String programmingLanguage, String title, String description, String difficulty, Long challengeId) {
+        private String compileOutput;
+        private String status;
+        public SubmissionDetailsDTO(String username, String code, String result, String programmingLanguage, String title, String description, String difficulty, Long challengeId, String compileOutput, String status) {
             this.username = username;
             this.code = code;
             this.result = result;
@@ -19,6 +21,8 @@ public class SubmissionDetailsDTO {
             this.description = description;
             this.difficulty = difficulty;
             this.challengeId = challengeId;
+            this.compileOutput = compileOutput;
+            this.status = status;
         }
 
     public String getUsername() {
@@ -84,6 +88,22 @@ public class SubmissionDetailsDTO {
         this.challengeId = challengeId;
     }
 
+    public String getCompileOutput() {
+        return compileOutput;
+    }
+
+    public void setCompileOutput(String compileOutput) {
+        this.compileOutput = compileOutput;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     // toString
         @Override
         public String toString() {
@@ -96,6 +116,8 @@ public class SubmissionDetailsDTO {
                     ", description='" + description + '\'' +
                     ", difficulty='" + difficulty + '\'' +
                     ", challengeId=" + challengeId +
+                    ", compileOutput='" + compileOutput + '\'' +
+                    ", status='" + status + '\'' +
                     '}';
         }
 }
