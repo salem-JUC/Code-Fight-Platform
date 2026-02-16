@@ -49,7 +49,10 @@ public class SubmissionService {
         submission.setProgrammingLanguage(match.getProgrammingLanguage());
         submission.setSubmitterID(submitterId);
         List<TestCase> testCases = testCaseRepo.findByChallengeId(match.getCurrentChallengeId());
-        submission.setResult(evaluationModule.evaluate(submission , testCases));
+        
+        // Updated to use the new evaluate signature
+        submission = evaluationModule.evaluate(submission , testCases);
+        
         System.out.println("Submission evaluated: assigned" + submission.getResult());
         submission = submissionRepo.save(submission);
         System.out.println("Submission created: " + submission.getSubmissionID());
@@ -63,7 +66,4 @@ public class SubmissionService {
     public List<SubmissionWithUserDTO> getAllSubmissionsWithUsernames(Long challengeId) {
         return submissionRepo.getAllSubmissionsWithUsernames(challengeId);
     }
-
-
-
 }

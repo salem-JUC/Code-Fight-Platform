@@ -7,24 +7,30 @@ public class Submission {
     private String result;
     private String code;
     private String programmingLanguage;
+    private String compileOutput;
+    private String status;
 
     // Constructors
     public Submission() {}
 
-    public Submission(Long submissionID, Long challengeID, Long submitterID, String result, String code, String programmingLanguage) {
+    public Submission(Long submissionID, Long challengeID, Long submitterID, String result, String code, String programmingLanguage, String compileOutput, String status) {
         this.submissionID = submissionID;
         this.challengeID = challengeID;
         this.submitterID = submitterID;
         this.result = result;
         this.code = code;
         this.programmingLanguage = programmingLanguage;
+        this.compileOutput = compileOutput;
+        this.status = status;
     }
-    public Submission(Long submissionID, Long challengeID, Long submitterID, String code, String programmingLanguage) {
+    public Submission(Long submissionID, Long challengeID, Long submitterID, String code, String programmingLanguage, String compileOutput, String status) {
         this.submissionID = submissionID;
         this.challengeID = challengeID;
         this.submitterID = submitterID;
         this.code = code;
         this.programmingLanguage = programmingLanguage;
+        this.compileOutput = compileOutput;
+        this.status = status;
     }
 
     // Getters and Setters
@@ -73,6 +79,8 @@ public class Submission {
                 ", result='" + result + '\'' +
                 ", code='" + code + '\'' +
                 ", programmingLanguage='" + programmingLanguage + '\'' +
+                ", compileOutput='" + compileOutput + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 
@@ -86,5 +94,20 @@ public class Submission {
 
     public void setProgrammingLanguage(String programmingLanguage) {
         this.programmingLanguage = programmingLanguage;
+    }
+
+    public String getCompileOutput() {
+        return compileOutput;
+    }
+
+    public void setCompileOutput(String compileOutput) {
+        this.compileOutput = compileOutput;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

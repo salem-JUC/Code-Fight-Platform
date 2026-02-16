@@ -8,12 +8,17 @@ public class SubmissionDTO {
     private String Difficulty;
     private String ProgrammingLanguage;
     private String Result;
-    public SubmissionDTO(long submissionID, String challengeTitle, String difficulty, String programmingLanguage, String result) {
+    private String CompileOutput;
+    private String Status;
+
+    public SubmissionDTO(long submissionID, String challengeTitle, String difficulty, String programmingLanguage, String result, String compileOutput, String status) {
         SubmissionID = submissionID;
         ChallengeTitle = challengeTitle;
         Difficulty = difficulty;
         ProgrammingLanguage = programmingLanguage;
         Result = result;
+        CompileOutput = compileOutput;
+        Status = status;
     }
 
     public long getSubmissionID() {
@@ -56,6 +61,22 @@ public class SubmissionDTO {
         Result = result;
     }
 
+    public String getCompileOutput() {
+        return CompileOutput;
+    }
+
+    public void setCompileOutput(String compileOutput) {
+        CompileOutput = compileOutput;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
     @Override
     public String toString() {
         return "SubmissionDTO{" +
@@ -64,6 +85,8 @@ public class SubmissionDTO {
                 ", Difficulty='" + Difficulty + '\'' +
                 ", ProgrammingLanguage='" + ProgrammingLanguage + '\'' +
                 ", Result='" + Result + '\'' +
+                ", CompileOutput='" + CompileOutput + '\'' +
+                ", Status='" + Status + '\'' +
                 '}';
     }
 }

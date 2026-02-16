@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS submission (
     result VARCHAR(100),
     code TEXT,
     programming_language VARCHAR(50),
+    compile_output TEXT,
+    status ENUM('PENDING', 'FINISHED') NOT NULL,
     FOREIGN KEY (challenge_id) REFERENCES challenge(challenge_id),
     FOREIGN KEY (submitter_id) REFERENCES `user`(user_id)
 );

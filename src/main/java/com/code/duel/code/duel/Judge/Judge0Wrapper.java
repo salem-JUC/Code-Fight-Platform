@@ -22,11 +22,29 @@ public class Judge0Wrapper {
     private static final String JUDGE0_API_KEY = "64431d57cbmsh5e695d9da960983p1ca418jsn067194f9b2fa";
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
 
+    public static class Judge0Result {
+        private final String status;
+        private final String compileOutput;
+
+        public Judge0Result(String status, String compileOutput) {
+            this.status = status;
+            this.compileOutput = compileOutput;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public String getCompileOutput() {
+            return compileOutput;
+        }
+    }
+
     public String getJUDGE0API_KEY() {
         return JUDGE0_API_KEY;
     }
 
-    public String submit(String sourceCode, int languageId, String input, String expected_output) throws IOException, InterruptedException {
+    public Judge0Result submit(String sourceCode, int languageId, String input, String expected_output) throws IOException, InterruptedException {
         String sourceCodeEncoded = Base64.getEncoder().encodeToString(sourceCode.getBytes());
         String inputEncoded = Base64.getEncoder().encodeToString(input.getBytes());
         String expectedOutputEncoded = Base64.getEncoder().encodeToString(expected_output.getBytes());
@@ -52,6 +70,17 @@ public class Judge0Wrapper {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(response.body());
         String statusDescription = rootNode.path("status").path("description").asText();
+        String compileOutputEncoded = rootNode.path("compile_output").asText();
+        String compileOutput = null;
+
+        if (compileOutputEncoded != null && !compileOutputEncoded.isBlank() && !compileOutputEncoded.equals("null")) {
+            try {
+                compileOutput = new String(Base64.getDecoder().decode(compileOutputEncoded));
+            } catch (IllegalArgumentException e) {
+                logger.error("Failed to decode compile_output", e);
+                compileOutput = compileOutputEncoded;
+            }
+        }
 
         if (statusDescription == null || statusDescription.isBlank()) {
             logger.warn("Judge0 response missing status description, raw body: {}", response.body());
@@ -59,7 +88,7 @@ public class Judge0Wrapper {
             logger.info("Received Judge0 status: {}", statusDescription);
         }
 
-        return statusDescription;
+        return new Judge0Result(statusDescription, compileOutput);
     }
 
     public String getLanguages() throws IOException, InterruptedException {

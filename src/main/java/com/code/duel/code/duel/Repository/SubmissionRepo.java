@@ -23,7 +23,7 @@ public class SubmissionRepo {
 
     // Save a new submission
     public Submission save(Submission submission) {
-        String sql = "INSERT INTO submission (challenge_id, submitter_id, result, code, programming_language) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO submission (challenge_id, submitter_id, result, code, programming_language, compile_output, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -32,6 +32,8 @@ public class SubmissionRepo {
             ps.setString(3, submission.getResult());
             ps.setString(4, submission.getCode());
             ps.setString(5, submission.getProgrammingLanguage());
+            ps.setString(6, submission.getCompileOutput());
+            ps.setString(7, submission.getStatus());
             return ps;
         }, keyHolder);
 
@@ -52,7 +54,9 @@ public class SubmissionRepo {
                         rs.getLong("submitter_id"),
                         rs.getString("result"),
                         rs.getString("code"),
-                        rs.getString("programming_language")
+                        rs.getString("programming_language"),
+                        rs.getString("compile_output"),
+                        rs.getString("status")
                 ));
     }
 
@@ -66,7 +70,9 @@ public class SubmissionRepo {
                         rs.getLong("submitter_id"),
                         rs.getString("result"),
                         rs.getString("code"),
-                        rs.getString("programming_language")
+                        rs.getString("programming_language"),
+                        rs.getString("compile_output"),
+                        rs.getString("status")
                 ));
     }
 
@@ -79,13 +85,15 @@ public class SubmissionRepo {
                         rs.getLong("submitter_id"),
                         rs.getString("result"),
                         rs.getString("code"),
-                        rs.getString("programming_language")
+                        rs.getString("programming_language"),
+                        rs.getString("compile_output"),
+                        rs.getString("status")
                 ));
     }
 
     public List<SubmissionDTO> getSubmissionsOfUser(Long userId){
         String sql = """
-                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result
+                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result, s.compile_output, s.status
                 from submission s
                 inner join challenge c on s.challenge_id = c.challenge_id
                 where s.submitter_id = ?;
@@ -98,7 +106,9 @@ public class SubmissionRepo {
                     rowSet.getString("title"),
                     rowSet.getString("difficulty"),
                     rowSet.getString("programming_language"),
-                    rowSet.getString("result")
+                    rowSet.getString("result"),
+                    rowSet.getString("compile_output"),
+                    rowSet.getString("status")
             );
             submissions.add(submission);
         }
@@ -107,8 +117,8 @@ public class SubmissionRepo {
 
     // Update a submission
     public void update(Submission submission) {
-        String sql = "UPDATE submission SET challenge_id = ?, submitter_id = ?, result = ?, code = ?, programming_language = ? WHERE submission_id = ?";
-        jdbcTemplate.update(sql, submission.getChallengeID(), submission.getSubmitterID(), submission.getResult(), submission.getCode(), submission.getProgrammingLanguage(), submission.getSubmissionID());
+        String sql = "UPDATE submission SET challenge_id = ?, submitter_id = ?, result = ?, code = ?, programming_language = ?, compile_output = ?, status = ? WHERE submission_id = ?";
+        jdbcTemplate.update(sql, submission.getChallengeID(), submission.getSubmitterID(), submission.getResult(), submission.getCode(), submission.getProgrammingLanguage(), submission.getCompileOutput(), submission.getStatus(), submission.getSubmissionID());
     }
 
     // Delete a submission by ID

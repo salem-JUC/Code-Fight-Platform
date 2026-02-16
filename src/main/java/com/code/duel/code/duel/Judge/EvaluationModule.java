@@ -18,7 +18,7 @@ public class EvaluationModule {
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluationModule.class);
 
-    public String evaluate(Submission submission, List<TestCase> testCases) {
+    public Submission evaluate(Submission submission, List<TestCase> testCases) {
         logger.info("Evaluating submission: {} by user id: {}", submission.getSubmissionID(), submission.getSubmitterID());
         int languageId =0;
         if (submission.getProgrammingLanguage().equals("Java")) {
@@ -33,27 +33,38 @@ public class EvaluationModule {
             logger.info("Evaluating test case {}: input = {}, expected output = {}", i + 1, testCase.getInput(), testCase.getExpectedOutput());
             try {
                 //the submit mathod want languageid to be int not string
-                String status = judge0Wrapper.submit(
+                Judge0Wrapper.Judge0Result result = judge0Wrapper.submit(
                         submission.getCode(),
                         languageId,
                         testCase.getInput(),
                         testCase.getExpectedOutput()
                 );
+                String status = result.getStatus();
+                if (result.getCompileOutput() != null) {
+                    submission.setCompileOutput(result.getCompileOutput());
+                }
+
                 logger.info("Test case {} status: {}", i + 1, status);
 
                 if (!status.equals("Accepted")) {
                     logger.info("Test case {} failed: {}", i + 1, status);
-                    return status;
+                    submission.setResult(status);
+                    submission.setStatus("FINISHED");
+                    return submission;
                 }
 
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
-                return "Execuation Error";
+                submission.setResult("Execuation Error");
+                submission.setStatus("FINISHED");
+                return submission;
             }
             logger.info("Test case {} passed", i + 1);
         }
         logger.info("All test cases passed for submission: {} by user id: {}", submission.getSubmissionID(), submission.getSubmitterID());
 
-        return "Accepted";
+        submission.setResult("Accepted");
+        submission.setStatus("FINISHED");
+        return submission;
     }
 }
