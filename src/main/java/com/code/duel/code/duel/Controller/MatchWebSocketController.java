@@ -64,7 +64,7 @@ public class MatchWebSocketController {
             System.out.println("Submission result: " + result);
             if (!result.getResult().equals("Accepted")) {
                 System.out.println("Submission rejected: " + result);
-                sendSubmissionResponse(principal.getName(), false, result.getResult());
+                sendSubmissionResponse(principal.getName(), false, result.getResult(), result.getCompileOutput());
                 return;
             }
             processSuccessfulHit(matchId, user.getUserID(), result.getChallengeID());
@@ -134,12 +134,12 @@ public class MatchWebSocketController {
         );
     }
 
-    private void sendSubmissionResponse(String principalName, boolean accepted, String message) {
+    private void sendSubmissionResponse(String principalName, boolean accepted, String result, String compileOutput) {
         System.out.println("Sending submission response to player ID: " + principalName + ", accepted: " + accepted);
         messagingTemplate.convertAndSendToUser(
                 principalName,
                 "/queue/submission",
-                new SubmissionResponse(accepted, message)
+                new SubmissionResponse(accepted, result, compileOutput)
         );
     }
 

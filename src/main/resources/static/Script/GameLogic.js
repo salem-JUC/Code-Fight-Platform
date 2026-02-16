@@ -194,7 +194,18 @@ class GameLogic {
             this.showGameSuccess("✅️ Correct solution");
         } else {
             console.log('Submission rejected:', response.message || 'Wrong solution');
-            this.showGameError("❌ Wrong solution" + (response.message ? ": " + response.message : ""));
+            this.showGameError("❌ Wrong solution");
+            
+            // Show detailed error modal
+            const modal = document.getElementById('submissionResultModal');
+            const messageEl = document.getElementById('submissionMessage');
+            const outputEl = document.getElementById('compilerOutput');
+            
+            if (modal && messageEl && outputEl) {
+                messageEl.textContent = response.message || "Submission rejected";
+                outputEl.textContent = response.compileOutput || "No compiler output available.";
+                modal.style.display = 'flex';
+            }
         }
     }
 
@@ -329,7 +340,25 @@ class GameLogic {
         document.getElementById('submitBtn').addEventListener('click', () => this.handleSubmit());
         document.getElementById('quitBtn').addEventListener('click', () => this.quit());
 
-        
+        // Submission Result Modal Events
+        const modal = document.getElementById('submissionResultModal');
+        const closeBtn = document.getElementById('closeSubmissionBtn');
+        const closeIcon = document.getElementById('closeSubmissionModal');
+
+        const closeModal = () => {
+            if (modal) modal.style.display = 'none';
+        };
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (closeIcon) closeIcon.addEventListener('click', closeModal);
+
+        if (modal) {
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
     }
 }
 

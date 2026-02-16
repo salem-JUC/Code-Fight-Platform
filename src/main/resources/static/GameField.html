@@ -160,6 +160,19 @@
             <button class="return-btn" onclick="window.location.href = 'index.html'">Return to Main Page</button>
         </div>
     </div>
+
+    <!-- Submission Result Modal -->
+    <div class="submission-result-modal" id="submissionResultModal">
+        <div class="submission-result-content">
+            <span class="close-submission-modal" id="closeSubmissionModal">&times;</span>
+            <h2 class="submission-title">Submission Failed</h2>
+            <p id="submissionMessage" class="submission-message"></p>
+            <div class="compiler-output-container">
+                <pre id="compilerOutput" class="compiler-output"></pre>
+            </div>
+            <button class="return-btn small-btn" id="closeSubmissionBtn">Close</button>
+        </div>
+    </div>
     <script src="./Script/MonacoHandler.js"></script>
     <script src="./Script/GameFildSound.js"></script>
     <script src="./Script/Overworld.js"></script>

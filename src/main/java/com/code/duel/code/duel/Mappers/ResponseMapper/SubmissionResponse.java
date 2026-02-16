@@ -3,7 +3,13 @@ package com.code.duel.code.duel.Mappers.ResponseMapper;
 public class SubmissionResponse {
     private boolean accepted;
     private String message;
-    public SubmissionResponse(boolean accepted, String message) {
+    private String compileOutput;
+
+    
+    public SubmissionResponse(boolean accepted, String message, String compileOutput) {
+        this.accepted = accepted;
+        this.message = message;
+        this.compileOutput = compileOutput;
     }
 
     public boolean isAccepted() {
@@ -20,5 +26,12 @@ public class SubmissionResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+    public String getCompileOutput() {
+        return compileOutput;
+    }
+
+    public void setCompileOutput(String compileOutput) {
+        this.compileOutput = compileOutput;
     }
 }
