@@ -179,4 +179,25 @@ public class SubmissionRepo {
         }
         return submissions;
     }
+
+    public List<SubmissionDTO> findAll() {
+        String sql = """
+                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result
+                from submission s
+                inner join challenge c on s.challenge_id = c.challenge_id
+                """;
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+        List<SubmissionDTO> submissions = new ArrayList<>();
+        while (rowSet.next()){
+            SubmissionDTO submission = new SubmissionDTO(
+                    rowSet.getLong("submission_id"),
+                    rowSet.getString("title"),
+                    rowSet.getString("difficulty"),
+                    rowSet.getString("programming_language"),
+                    rowSet.getString("result")
+            );
+            submissions.add(submission);
+        }
+        return submissions;
+    }
 }

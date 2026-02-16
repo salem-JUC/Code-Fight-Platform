@@ -17,9 +17,18 @@ public class ChallengeService {
         return challengeRepo.findById(challengeId);
     }
 
+    public java.util.List<Challenge> getAllChallenges() {
+        return challengeRepo.findAll();
+    }
+
     // Create a new challenge
     public void createChallenge(Challenge challenge) {
         challengeRepo.save(challenge);
+    }
+
+    // Update a challenge
+    public void updateChallenge(Challenge challenge) {
+        challengeRepo.update(challenge);
     }
 
     //Delete a challenge

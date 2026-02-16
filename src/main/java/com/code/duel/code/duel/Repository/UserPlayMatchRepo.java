@@ -55,6 +55,12 @@ public class UserPlayMatchRepo {
         jdbcTemplate.update(sql, userID, matchID);
     }
 
+    // Delete all entries for a specific match
+    public void deleteByMatchId(Long matchID) {
+        String sql = "DELETE FROM user_play_match WHERE match_id = ?";
+        jdbcTemplate.update(sql, matchID);
+    }
+
     public UserPlayMatch findByUserIDAndMatchID(Long playerId, Long matchId) {
         String sql = "SELECT * FROM user_play_match WHERE user_id = ? AND match_id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{playerId, matchId}, (rs, rowNum) ->

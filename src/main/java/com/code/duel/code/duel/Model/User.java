@@ -91,7 +91,12 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        if (this.role == null) return Collections.emptyList();
+        try {
+            return Collections.singletonList(Role.valueOf(this.role));
+        } catch (IllegalArgumentException e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override

@@ -59,11 +59,21 @@ public class SubmissionService {
         return submission;
     }
 
+    
+
     public SubmissionDetailsDTO getSubmissionDetailsDTO(Long submissionId) {
         return submissionRepo.getSubmissionDetails(submissionId);
     }
 
     public List<SubmissionWithUserDTO> getAllSubmissionsWithUsernames(Long challengeId) {
         return submissionRepo.getAllSubmissionsWithUsernames(challengeId);
+    }
+
+    public List<SubmissionDTO> getAllSubmissions() {
+        return submissionRepo.findAll();
+    }
+
+    public void deleteSubmission(Long submissionId) {
+        submissionRepo.deleteById(submissionId);
     }
 }

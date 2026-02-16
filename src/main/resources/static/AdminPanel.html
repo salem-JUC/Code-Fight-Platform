@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Fight - Admin Panel</title>
+    <link rel="stylesheet" href="./Style/AdminPanel.css">
+    <script src="/monaco/vs/loader.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Admin Panel</h1>
+            <nav>
+                <button class="nav-btn active" data-target="challenges">Challenges</button>
+                <button class="nav-btn" data-target="submissions">Submissions</button>
+                <button class="nav-btn" data-target="users">Users</button>
+                <button class="nav-btn" data-target="matches">Matches</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Challenges Section -->
+            <section id="challenges" class="active-section">
+                <h2>Manage Challenges</h2>
+                <button id="newChallengeBtn">New Challenge</button>
+                <div id="challengesList" class="list-view"></div>
+                
+                <!-- Challenge Form Modal -->
+                <div id="challengeModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h3 id="challengeModalTitle">New Challenge</h3>
+                        <form id="challengeForm">
+                            <input type="hidden" id="challengeId">
+                            <div class="form-group">
+                                <label for="title">Title:</label>
+                                <input type="text" id="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea id="description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="difficulty">Difficulty:</label>
+                                <select id="difficulty" required>
+                                    <option value="Easy">Easy</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Hard">Hard</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="sample">Sample:</label>
+                                <textarea id="sample" required></textarea>
+                            </div>
+                            
+                            <div id="testCasesSection">
+                                <h4>Test Cases</h4>
+                                <div id="testCasesContainer"></div>
+                                <button type="button" id="addTestCaseBtn">Add Test Case</button>
+                            </div>
+                            
+                            <button type="submit">Save Challenge</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submissions Section -->
+            <section id="submissions">
+                <h2>Manage Submissions</h2>
+                <div id="submissionsList" class="list-view"></div>
+                
+                <!-- Submission Detail Modal -->
+                <div id="submissionModal" class="modal">
+                    <div class="modal-content large-modal">
+                        <span class="close">&times;</span>
+                        <h3>Submission Details</h3>
+                        <div id="submissionCodeEditor" style="height: 400px; border: 1px solid #ccc;"></div>
+                        <div id="submissionInfo"></div>
+                        <button id="deleteSubmissionBtn" class="danger-btn">Delete Submission</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users">
+                <h2>Manage Users</h2>
+                <div id="usersList" class="list-view"></div>
+            </section>
+
+            <!-- Matches Section -->
+            <section id="matches">
+                <h2>Manage Matches</h2>
+                <div id="matchesList" class="list-view"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="./Script/AdminPanel.js"></script>
+</body>
+</html>
+

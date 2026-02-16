@@ -1,6 +1,7 @@
 package com.code.duel.code.duel.Repository;
 
 
+import com.code.duel.code.duel.DTO.MatchDTO.MatchWithPlayersDTO;
 import com.code.duel.code.duel.Mappers.ResponseMapper.MatchStatusResponseMapper;
 import com.code.duel.code.duel.Model.Difficulty;
 import com.code.duel.code.duel.Model.Match;
@@ -72,6 +73,26 @@ public class MatchRepo {
                         rs.getString("programming_language"),
                         rs.getString("status"),
                         rs.getLong("winner_id")
+                ));
+    }
+
+    public List<MatchWithPlayersDTO> findAllWithPlayers() {
+        String sql = """
+            SELECT m.*, GROUP_CONCAT(upm.username SEPARATOR ', ') as players
+            FROM `match` m
+            LEFT JOIN user_play_match upm ON m.match_id = upm.match_id
+            GROUP BY m.match_id
+            ORDER BY m.match_id DESC
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
+                new MatchWithPlayersDTO(
+                        rs.getLong("match_id"),
+                        rs.getLong("challenge_id"),
+                        rs.getString("difficulty"),
+                        rs.getString("programming_language"),
+                        rs.getString("status"),
+                        rs.getLong("winner_id"),
+                        rs.getString("players")
                 ));
     }
 

@@ -42,6 +42,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/Login.html" , "/index.html").permitAll()
                         .requestMatchers("/api/auth/**" , "/actuator/**").permitAll()
+                        .requestMatchers("/AdminPanel.html").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -94,7 +96,7 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .requestMatchers("/Style/**", "/Script/**", "/Asset/**", "/favicon.ico" , "/error/**");
+                .requestMatchers("/Style/**", "/Script/**", "/Asset/**", "/favicon.ico" , "/error/**", "/monaco/**");
     }
 
 
