@@ -8,14 +8,12 @@ public class SubmissionDTO {
     private String Difficulty;
     private String ProgrammingLanguage;
     private String Result;
-    public SubmissionDTO(long submissionID, String challengeTitle, String difficulty, String programmingLanguage, String result, String compileOutput, String status) {
+    public SubmissionDTO(long submissionID, String challengeTitle, String difficulty, String programmingLanguage, String result) {
         SubmissionID = submissionID;
         ChallengeTitle = challengeTitle;
         Difficulty = difficulty;
         ProgrammingLanguage = programmingLanguage;
         Result = result;
-        CompileOutput = compileOutput;
-        Status = status;
     }
 
     public long getSubmissionID() {
