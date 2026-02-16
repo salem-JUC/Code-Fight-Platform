@@ -19,7 +19,7 @@ body {
     background: url("../Asset/PpBG.png") no-repeat center/cover fixed;
     backdrop-filter: blur(3px);
     padding: 20px;
-    overflow: hidden; /* منع السكرول العام */
+    overflow-y: auto; /* Allow vertical scrolling */
 }
 .PP {
 

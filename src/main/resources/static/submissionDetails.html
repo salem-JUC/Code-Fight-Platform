@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="./Style/styleSP.css">
     <link rel="stylesheet" href="./Style/stylepp.css">
+    <script src="/monaco/vs/loader.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
@@ -46,20 +47,14 @@
             <h2 class="history-header">YOUR CODE</h2>
             <div class="games-list">
                 <div class="game-entry">
-                    <div class="game-mode"><p id="code">
-                        public class LongArithmeticExample {
-                        public static void main(String[] args) {
-                            long a = 5000000000L;
-                            long b = 2000000000L;
-                            long sum = a + b;
-                            long product = a * b;
-                            System.out.println("Sum: " + sum);
-                            System.out.println("Product: " + product);
-                        }
-                    }
-                      </p>
+                    <div class="game-mode" style="width: 100%; height: 400px;">
+                        <div id="monaco-editor-container" style="width: 100%; height: 100%;"></div>
                     </div>
-                    
+                </div>
+            </div>
+            <div class="info-card" style="margin-top: 20px;">
+                <div class="info-label">Compiler Output</div>
+                <pre id="compilerOutput" class="compiler-output" style="background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 4px; overflow-x: auto; font-family: 'Courier New', monospace; min-height: 50px;"></pre>
             </div>
             <div class="info-card">
                     <div class="info-label">Result</div>
@@ -99,10 +94,26 @@
         document.getElementById("challengeTxt").innerHTML = response.description;
         document.getElementById("language").innerHTML = response.programmingLanguage;
         document.getElementById("result").innerHTML = response.result;
-        document.getElementById("code").innerHTML = response.code;
         document.getElementById("difficulty").innerHTML = response.difficulty;
+        document.getElementById("compilerOutput").textContent = response.compileOutput || "No compiler output available.";
+        
         document.getElementById("globalBtn").addEventListener("click", function() {
             window.location.href=`AllSubmissions.html?challengeId=${response.challengeId}`
+        });
+
+        // Initialize Monaco Editor
+        require.config({ paths: { 'vs': '/monaco/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            const editor = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+                value: response.code,
+                language: response.programmingLanguage.toLowerCase() === 'java' ? 'java' : 'python',
+                theme: 'vs-dark',
+                readOnly: true,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 14
+            });
         });
     }
     displayFunction();
