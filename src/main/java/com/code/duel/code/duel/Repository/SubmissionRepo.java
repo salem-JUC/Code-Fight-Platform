@@ -93,7 +93,7 @@ public class SubmissionRepo {
 
     public List<SubmissionDTO> getSubmissionsOfUser(Long userId){
         String sql = """
-                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result, s.compile_output, s.status
+                select s.submission_id, c.title, c.difficulty, s.programming_language, s.result
                 from submission s
                 inner join challenge c on s.challenge_id = c.challenge_id
                 where s.submitter_id = ?;
@@ -106,9 +106,7 @@ public class SubmissionRepo {
                     rowSet.getString("title"),
                     rowSet.getString("difficulty"),
                     rowSet.getString("programming_language"),
-                    rowSet.getString("result"),
-                    rowSet.getString("compile_output"),
-                    rowSet.getString("status")
+                    rowSet.getString("result")
             );
             submissions.add(submission);
         }
@@ -129,7 +127,7 @@ public class SubmissionRepo {
 
     public SubmissionDetailsDTO getSubmissionDetails(Long submissionId) {
         String sql = """
-                select u.username, s.code, s.result, s.programming_language, c.title, c.description, c.difficulty, c.challenge_id
+                select u.username, s.code, s.result, s.programming_language, c.title, c.description, c.difficulty, c.challenge_id, s.compile_output, s.status
                 from submission s
                 inner join `user` u on s.submitter_id = u.user_id
                 inner join challenge c on s.challenge_id = c.challenge_id
@@ -148,7 +146,9 @@ public class SubmissionRepo {
                             rowSet.getString("title"),
                             rowSet.getString("description"),
                             rowSet.getString("difficulty"),
-                            rowSet.getLong("challenge_id")
+                            rowSet.getLong("challenge_id"),
+                            rowSet.getString("compile_output"),
+                            rowSet.getString("status")
                     );
         }
         return submissionDetailsDTO;
