@@ -54,10 +54,7 @@ public class PendingHandlerJanitor {
         try {
             UserPlayMatch winner = matchService.getTheOpponent(matchId , userId);
             matchService.endMatch(matchId , winner.getUserID());
-            messagingTemplate.convertAndSend(
-                    "/topic/match/" + matchId + "/ended",
-                    new MatchResult(winner.getUserID(), winner.getUsername())
-            );
+            matchService.broadcastMatchEnd(matchId , winner.getUserID(), winner.getUsername());
         } catch (EmptyResultDataAccessException e) {
             logger.info("Expired user {} could not resolve opponent in match {}, skipping cleanup", userId, matchId);
         }

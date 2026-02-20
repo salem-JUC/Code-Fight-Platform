@@ -57,18 +57,12 @@ public class MatchWebSocketController {
     @MessageMapping("/match/{matchId}/submit")
     public void handleCodeSubmission(@DestinationVariable Long matchId, @Payload SubmissionRequestMapper submission, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
-        System.out.println("Received submission from user: " + user.getUsername() + " for match ID: " + matchId);
         try {
             // 1. Validate the submission
-            Submission result = submissionService.createSubmission(matchId, user.getUserID(), submission.getCode());
-            System.out.println("Submission result: " + result);
-            if (!result.getResult().equals("Accepted")) {
-                System.out.println("Submission rejected: " + result);
-                sendSubmissionResponse(principal.getName(), false, result.getResult(), result.getCompileOutput());
-                return;
-            }
-            processSuccessfulHit(matchId, user.getUserID(), result.getChallengeID());
-
+            Submission pendingSubmission = submissionService.createSubmission(matchId, user.getUserID(), submission.getCode());
+            System.out.println("new submissioj created with id " + pendingSubmission.getSubmissionID());
+            submissionService.evaluateSubmission(pendingSubmission , matchId , principal.getName());
+            System.out.println("evaluation submission is called (this is after evalauteSubmission calling");
         } catch (Exception e) {
             sendError(principal.getName(), "Submission error: " + e.getMessage());
         }
@@ -82,66 +76,11 @@ public class MatchWebSocketController {
         matchService.endMatch(matchId, winner.getUserID());
         pendingService.removeIfPending(user.getUserID());
         pendingService.removeIfPending(winner.getUserID());
-        broadcastMatchEnd(matchId, winner.getUserID(), winner.getUsername());
+        matchService.broadcastMatchEnd(matchId, winner.getUserID(), winner.getUsername());
     }
 
-    private void processSuccessfulHit(Long matchId, Long playerId, Long challengeId) {
-
-        matchService.handleCorrectSubmmission(matchId, playerId, challengeId);
 
 
-        MatchStatusResponseMapper status = matchService.getMatchStatus(matchId, playerId);
-
-
-        broadcastHit(matchId, playerId, status);
-
-
-        if (status.getSecondScore() <= 0) {
-            broadcastMatchEnd(matchId, playerId, status.getPlayerName());
-        } else {
-            assignNewChallenge(matchId);
-        }
-    }
-
-    private void assignNewChallenge(Long matchId) {
-        logger.info("Assigning new challenge for match ID: {}", matchId);
-        Challenge assignedChallenge = matchService.assignChallenge(matchId);
-
-        System.out.println("Assigning new challenge for match ID: " + matchId);
-        // Broadcast new challenge to both players
-        messagingTemplate.convertAndSend(
-                "/topic/match/" + matchId + "/challenge",
-                assignedChallenge
-        );
-    }
-
-    private void broadcastHit(Long matchId, Long hittingPlayerId,
-                              MatchStatusResponseMapper status) {
-        messagingTemplate.convertAndSend(
-                "/topic/match/" + matchId + "/hit",
-                new HitNotifcation(
-                        hittingPlayerId,
-                        status.getPlayerScore(),
-                        status.getSecondScore()
-                )
-        );
-    }
-
-    private void broadcastMatchEnd(Long matchId, Long winnerId, String winnerName) {
-        messagingTemplate.convertAndSend(
-                "/topic/match/" + matchId + "/ended",
-                new MatchResult(winnerId, winnerName)
-        );
-    }
-
-    private void sendSubmissionResponse(String principalName, boolean accepted, String result, String compileOutput) {
-        System.out.println("Sending submission response to player ID: " + principalName + ", accepted: " + accepted);
-        messagingTemplate.convertAndSendToUser(
-                principalName,
-                "/queue/submission",
-                new SubmissionResponse(accepted, result, compileOutput)
-        );
-    }
 
     private void sendError(String principalName, String errorMessage) {
         messagingTemplate.convertAndSendToUser(

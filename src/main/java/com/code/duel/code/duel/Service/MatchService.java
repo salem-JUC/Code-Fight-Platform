@@ -2,7 +2,10 @@ package com.code.duel.code.duel.Service;
 
 import com.code.duel.code.duel.Exception.MatchNotFoundException;
 import com.code.duel.code.duel.Judge.Judge0Wrapper;
+import com.code.duel.code.duel.Mappers.ResponseMapper.HitNotifcation;
+import com.code.duel.code.duel.Mappers.ResponseMapper.MatchResult;
 import com.code.duel.code.duel.Mappers.ResponseMapper.MatchStatusResponseMapper;
+import com.code.duel.code.duel.Mappers.ResponseMapper.SubmissionResponse;
 import com.code.duel.code.duel.Model.Challenge;
 import com.code.duel.code.duel.Model.Match;
 import com.code.duel.code.duel.Model.UserPlayMatch;
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,13 +27,16 @@ import java.util.Optional;
 public class MatchService {
 
     @Autowired
-    MatchRepo matchRepo;
+    private MatchRepo matchRepo;
     @Autowired
-    UserPlayMatchRepo userPlayMatchRepo;
+    private UserPlayMatchRepo userPlayMatchRepo;
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
     @Autowired
-    ChallengeRepo challengeRepo;
+    private ChallengeRepo challengeRepo;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
@@ -170,4 +177,61 @@ public class MatchService {
         return matchRepo.findRunningMatchOfUser(userId);
     }
 
+
+     void processSuccessfulHit(Long matchId, Long playerId, Long challengeId) {
+
+        handleCorrectSubmmission(matchId, playerId, challengeId);
+
+
+        MatchStatusResponseMapper status = getMatchStatus(matchId, playerId);
+
+
+        broadcastHit(matchId, playerId, status);
+
+
+        if (status.getSecondScore() <= 0) {
+            broadcastMatchEnd(matchId, playerId, status.getPlayerName());
+        } else {
+            broadcastNewChallenge(matchId);
+        }
+    }
+
+     void broadcastHit(Long matchId, Long hittingPlayerId,
+                              MatchStatusResponseMapper status) {
+        messagingTemplate.convertAndSend(
+                "/topic/match/" + matchId + "/hit",
+                new HitNotifcation(
+                        hittingPlayerId,
+                        status.getPlayerScore(),
+                        status.getSecondScore()
+                )
+        );
+    }
+
+     public void broadcastMatchEnd(Long matchId, Long winnerId, String winnerName) {
+        messagingTemplate.convertAndSend(
+                "/topic/match/" + matchId + "/ended",
+                new MatchResult(winnerId, winnerName)
+        );
+    }
+     void broadcastNewChallenge(Long matchId) {
+        logger.info("Assigning new challenge for match ID: {}", matchId);
+        Challenge assignedChallenge = assignChallenge(matchId);
+
+        System.out.println("Assigning new challenge for match ID: " + matchId);
+        // Broadcast new challenge to both players
+        messagingTemplate.convertAndSend(
+                "/topic/match/" + matchId + "/challenge",
+                assignedChallenge
+        );
+    }
+
+    void sendSubmissionResponse(String principalName, boolean accepted, String result, String compileOutput) {
+        System.out.println("Sending submission response to player ID: " + principalName + ", accepted: " + accepted);
+        messagingTemplate.convertAndSendToUser(
+                principalName,
+                "/queue/submission",
+                new SubmissionResponse(accepted, result, compileOutput)
+        );
+    }
 }
